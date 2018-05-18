@@ -354,24 +354,31 @@ public final class BitstampAdapters {
     // Use only the first transaction, because we assume that for a single order id all transactions
     // will
     // be of the same currency pair
-    CurrencyPair currencyPair = adaptCurrencyPair(bitstampTransactions[0]);
-    Date date = bitstampTransactions[0].getDatetime();
+    CurrencyPair currencyPair = null;
+    Date date = null;
+    if (bitstampTransactions.length > 0) {
+      currencyPair = adaptCurrencyPair(bitstampTransactions[0]);
+      date = bitstampTransactions[0].getDatetime();
+    }
 
     BigDecimal averagePrice =
         Arrays.stream(bitstampTransactions)
-            .map(t -> t.getPrice())
-            .reduce((x, y) -> x.add(y))
-            .get()
-            .divide(BigDecimal.valueOf(bitstampTransactions.length), 2);
+            .map(BitstampOrderTransaction::getPrice)
+            .reduce(BigDecimal::add)
+            .map(v -> v.divide(BigDecimal.valueOf(bitstampTransactions.length), 2))
+            .orElse(null);
 
     BigDecimal cumulativeAmount =
         Arrays.stream(bitstampTransactions)
-            .map(t -> getBaseCurrencyAmountFromBitstampTransaction(t))
-            .reduce((x, y) -> x.add(y))
-            .get();
+            .map(BitstampAdapters::getBaseCurrencyAmountFromBitstampTransaction)
+            .reduce(BigDecimal::add)
+            .orElseGet(() -> new BigDecimal(0));
 
     BigDecimal totalFee =
-        Arrays.stream(bitstampTransactions).map(t -> t.getFee()).reduce((x, y) -> x.add(y)).get();
+        Arrays.stream(bitstampTransactions)
+            .map(BitstampOrderTransaction::getFee)
+            .reduce(BigDecimal::add)
+            .orElse(new BigDecimal(0));
 
     Order.OrderStatus orderStatus = adaptOrderStatus(bitstampOrderStatusResponse.getStatus());
 
