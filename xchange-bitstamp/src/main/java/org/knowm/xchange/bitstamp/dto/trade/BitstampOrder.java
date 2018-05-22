@@ -18,6 +18,7 @@ public final class BitstampOrder {
 
   private BigDecimal price;
   private BigDecimal amount;
+  private String currencyPair;
   private String errorMessage;
 
   public BitstampOrder(
@@ -28,6 +29,7 @@ public final class BitstampOrder {
       @JsonProperty("type") int type,
       @JsonProperty("price") BigDecimal price,
       @JsonProperty("amount") BigDecimal amount,
+      @JsonProperty("currency_pair") String currencyPair,
       @JsonProperty("error") @JsonDeserialize(using = BitstampErrorDeserializer.class)
           String errorMessage) {
 
@@ -39,6 +41,7 @@ public final class BitstampOrder {
     this.datetime = BitstampUtils.parseDate(datetime);
     this.type = type;
     this.price = price;
+    this.currencyPair = currencyPair;
     this.amount = amount;
     this.errorMessage = errorMessage;
   }
@@ -72,6 +75,14 @@ public final class BitstampOrder {
   public String getErrorMessage() {
 
     return errorMessage;
+  }
+
+  public String getCurrencyPair() {
+    return currencyPair;
+  }
+
+  public void setCurrencyPair(String currencyPair) {
+    this.currencyPair = currencyPair;
   }
 
   @Override

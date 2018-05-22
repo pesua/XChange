@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.bitstamp.BitstampAdapters;
 import org.knowm.xchange.bitstamp.BitstampAuthenticatedV2;
@@ -48,21 +50,47 @@ public class BitstampTradeService extends BitstampTradeServiceRaw implements Tra
   @Override
   public OpenOrders getOpenOrders(OpenOrdersParams params) throws ExchangeException, IOException {
     Collection<CurrencyPair> pairs = DefaultOpenOrdersParamCurrencyPair.getPairs(params, exchange);
+
     List<LimitOrder> limitOrders = new ArrayList<>();
-    for (CurrencyPair pair : pairs) {
-      BitstampOrder[] openOrders = getBitstampOpenOrders(pair);
+    if (pairs.size() == exchange.getExchangeSymbols().size()) {
+      // all pairs
+      Map<String, CurrencyPair> pairsMap =
+          exchange
+              .getExchangeSymbols()
+              .stream()
+              .collect(Collectors.toMap(s -> s.base.getSymbol() + s.counter.getSymbol(), s -> s));
+
+      BitstampOrder[] openOrders = getAllBitstampOpenOrders();
       for (BitstampOrder bitstampOrder : openOrders) {
         OrderType orderType = bitstampOrder.getType() == 0 ? OrderType.BID : OrderType.ASK;
         String id = Integer.toString(bitstampOrder.getId());
+        CurrencyPair currencyPair = pairsMap.get(bitstampOrder.getCurrencyPair());
         BigDecimal price = bitstampOrder.getPrice();
         limitOrders.add(
             new LimitOrder(
                 orderType,
                 bitstampOrder.getAmount(),
-                pair,
+                currencyPair,
                 id,
                 bitstampOrder.getDatetime(),
                 price));
+      }
+    } else {
+      for (CurrencyPair pair : pairs) {
+        BitstampOrder[] openOrders = getBitstampOpenOrders(pair);
+        for (BitstampOrder bitstampOrder : openOrders) {
+          OrderType orderType = bitstampOrder.getType() == 0 ? OrderType.BID : OrderType.ASK;
+          String id = Integer.toString(bitstampOrder.getId());
+          BigDecimal price = bitstampOrder.getPrice();
+          limitOrders.add(
+              new LimitOrder(
+                  orderType,
+                  bitstampOrder.getAmount(),
+                  pair,
+                  id,
+                  bitstampOrder.getDatetime(),
+                  price));
+        }
       }
     }
     return new OpenOrders(limitOrders);

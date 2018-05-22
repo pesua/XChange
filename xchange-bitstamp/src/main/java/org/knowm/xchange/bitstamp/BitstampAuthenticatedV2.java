@@ -33,6 +33,14 @@ public interface BitstampAuthenticatedV2 {
       throws BitstampException, IOException;
 
   @POST
+  @Path("open_orders/all/")
+  BitstampOrder[] getAllOpenOrders(
+      @FormParam("key") String apiKey,
+      @FormParam("signature") ParamsDigest signer,
+      @FormParam("nonce") SynchronizedValueFactory<Long> nonce)
+      throws BitstampException, IOException;
+
+  @POST
   @Path("{side}/market/{pair}/")
   BitstampOrder placeMarketOrder(
       @FormParam("key") String apiKey,

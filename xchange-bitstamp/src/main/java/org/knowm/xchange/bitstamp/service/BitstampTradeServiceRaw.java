@@ -54,6 +54,14 @@ public class BitstampTradeServiceRaw extends BitstampBaseService {
     }
   }
 
+  public BitstampOrder[] getAllBitstampOpenOrders() throws IOException {
+    try {
+      return bitstampAuthenticatedV2.getAllOpenOrders(apiKey, signatureCreator, nonceFactory);
+    } catch (BitstampException e) {
+      throw handleError(e);
+    }
+  }
+
   public BitstampOrder placeBitstampMarketOrder(
       CurrencyPair pair, BitstampAuthenticatedV2.Side side, BigDecimal originalAmount)
       throws IOException {
