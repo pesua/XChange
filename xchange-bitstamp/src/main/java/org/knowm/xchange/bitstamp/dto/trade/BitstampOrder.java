@@ -11,7 +11,7 @@ import si.mazi.rescu.ExceptionalReturnContentException;
 /** @author Matija Mazi */
 public final class BitstampOrder {
 
-  private int id;
+  private long id;
   private Date datetime;
   /** 0 - buy (bid); 1 - sell (ask) */
   private int type;
@@ -24,7 +24,7 @@ public final class BitstampOrder {
   public BitstampOrder(
       @JsonProperty("status") String status,
       @JsonProperty("reason") Object reason,
-      @JsonProperty("id") int id,
+      @JsonProperty("id") long id,
       @JsonProperty("datetime") String datetime,
       @JsonProperty("type") int type,
       @JsonProperty("price") BigDecimal price,
@@ -51,7 +51,7 @@ public final class BitstampOrder {
     return datetime;
   }
 
-  public int getId() {
+  public long getId() {
 
     return id;
   }

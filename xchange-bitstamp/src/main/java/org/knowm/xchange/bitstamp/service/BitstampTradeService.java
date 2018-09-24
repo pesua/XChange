@@ -63,7 +63,7 @@ public class BitstampTradeService extends BitstampTradeServiceRaw implements Tra
       BitstampOrder[] openOrders = getAllBitstampOpenOrders();
       for (BitstampOrder bitstampOrder : openOrders) {
         OrderType orderType = bitstampOrder.getType() == 0 ? OrderType.BID : OrderType.ASK;
-        String id = Integer.toString(bitstampOrder.getId());
+        String id = Long.toString(bitstampOrder.getId());
         CurrencyPair currencyPair = pairsMap.get(bitstampOrder.getCurrencyPair());
         BigDecimal price = bitstampOrder.getPrice();
         limitOrders.add(
@@ -80,7 +80,7 @@ public class BitstampTradeService extends BitstampTradeServiceRaw implements Tra
         BitstampOrder[] openOrders = getBitstampOpenOrders(pair);
         for (BitstampOrder bitstampOrder : openOrders) {
           OrderType orderType = bitstampOrder.getType() == 0 ? OrderType.BID : OrderType.ASK;
-          String id = Integer.toString(bitstampOrder.getId());
+          String id = Long.toString(bitstampOrder.getId());
           BigDecimal price = bitstampOrder.getPrice();
           limitOrders.add(
               new LimitOrder(
@@ -107,7 +107,7 @@ public class BitstampTradeService extends BitstampTradeServiceRaw implements Tra
     if (bitstampOrder.getErrorMessage() != null) {
       throw new ExchangeException(bitstampOrder.getErrorMessage());
     }
-    return Integer.toString(bitstampOrder.getId());
+    return Long.toString(bitstampOrder.getId());
   }
 
   @Override
@@ -123,13 +123,13 @@ public class BitstampTradeService extends BitstampTradeServiceRaw implements Tra
     if (bitstampOrder.getErrorMessage() != null) {
       throw new ExchangeException(bitstampOrder.getErrorMessage());
     }
-    return Integer.toString(bitstampOrder.getId());
+    return Long.toString(bitstampOrder.getId());
   }
 
   @Override
   public boolean cancelOrder(String orderId) throws IOException, BitstampException {
 
-    return cancelBitstampOrder(Integer.parseInt(orderId));
+    return cancelBitstampOrder(Long.parseLong(orderId));
   }
 
   @Override
